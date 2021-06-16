@@ -1,0 +1,199 @@
+openapi: 3.0.1
+info:
+  title: demo
+  description: AppDynamics demonstration application using Micronaut
+  contact:
+    name: Microservices Foundation
+    url: https://confluence.corp.appdynamics.com/x/_sshAw
+  license:
+    name: AppDynamics Internal-only
+externalDocs:
+  description: Confluence landing
+  url: https://confluence.corp.appdynamics.com/x/H7giBg
+paths:
+  /api/v1/authors:
+    post:
+      summary: Endpoint to add an author in the system with provided details
+      description: Endpoint to add an author in the system with provided details
+      operationId: addAuthor
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddAuthorCommand'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorResponse'
+  /api/v1/authors/{id}:
+    get:
+      summary: Endpoint to get an author for a given UUID
+      description: Endpoint to get an author for a given UUID
+      operationId: getAuthor
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorResponse'
+  /api/v1/books:
+    get:
+      summary: List all books
+      description: List all books
+      operationId: listBooks
+      parameters: []
+      responses:
+        "200":
+          description: List of BookResponse
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookResponse'
+    post:
+      summary: Add a Book
+      description: Add a Book
+      operationId: addBook
+      parameters: []
+      requestBody:
+        description: AddBookCommand book details to add
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddBookCommand'
+        required: true
+      responses:
+        "201":
+          description: BookResponse Added Book
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookResponse'
+components:
+  schemas:
+    AddAuthorCommand:
+      required:
+      - email
+      - name
+      - plaintextSsn
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        name:
+          minLength: 1
+          type: string
+        plaintextSsn:
+          pattern: "^[0-9]{9}$"
+          type: string
+      description: Class representing the DTO model for a simple Author request.
+    AddBookCommand:
+      required:
+      - bookType
+      - isbn
+      - pageCount
+      - publishDate
+      - retailPrice
+      - title
+      type: object
+      properties:
+        authorIdList:
+          type: array
+          items:
+            type: string
+            format: uuid
+        bookType:
+          $ref: '#/components/schemas/AddBookCommand.BookType'
+        isbn:
+          pattern: "^[0-9]{10}$|^[0-9]{13}$"
+          type: string
+        pageCount:
+          minimum: 1
+          type: integer
+          format: int32
+        publishDate:
+          minLength: 1
+          type: string
+          format: date
+        retailPrice:
+          minimum: 1
+          type: integer
+          format: int32
+        title:
+          minLength: 1
+          type: string
+      description: Class representing the DTO model for a simple Book request.
+    AddBookCommand.BookType:
+      type: string
+      enum:
+      - UNKNOWN
+      - HARDCOVER
+      - PAPERBACK
+      - EBOOK
+    AuthorResponse:
+      required:
+      - email
+      - id
+      - name
+      type: object
+      properties:
+        email:
+          type: string
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      description: Class representing the DTO model for a simple Author response.
+    BookResponse:
+      required:
+      - bookType
+      - id
+      - isbn
+      - pageCount
+      - publishDate
+      - retailPrice
+      - sellingPrice
+      - title
+      type: object
+      properties:
+        authorResponseList:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuthorResponse'
+        bookType:
+          type: integer
+          format: int32
+        id:
+          type: string
+          format: uuid
+        isbn:
+          type: string
+        pageCount:
+          type: integer
+          format: int32
+        publishDate:
+          type: string
+          format: date
+        retailPrice:
+          type: integer
+          format: int32
+        sellingPrice:
+          type: integer
+          format: int32
+        title:
+          type: string
+      description: Class representing the DTO model for a simple Book response.
